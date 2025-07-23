@@ -11,4 +11,13 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # Route to receive search data in real time
+  post "/searches", to: "searches#create"
+
+  # Route to display analytics
+  get "/analytics", to: "analytics#index"
+
+  # Define the root path
+  root "analytics#index"
 end
