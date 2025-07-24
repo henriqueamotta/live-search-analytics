@@ -1,2 +1,28 @@
-<h1>Analytics#index</h1>
-<p>Find me in app/views/analytics/index.html.erb</p>
+<h1>Helpjuice SearchBox</h1>
+
+<h2>Search something</h2>
+<input type="text" id="search-box" placeholder="Start typing to search..." size="50">
+
+<hr>
+
+<h2>Trending Searches</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Search</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @trends.each do |query, count| %>
+    <tr>
+      <td><%= query %></td>
+      <td><%= count %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<script>
+   // JavaScript to handle the search box input
+</script>
