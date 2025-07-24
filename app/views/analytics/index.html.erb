@@ -24,5 +24,37 @@
 </table>
 
 <script>
-   // JavaScript to handle the search box input
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchBox = document.getElementById("search-box");
+
+    let debouceTimer;
+    const debounce = (callback, time) => {
+      window.clearTimeout(debouceTimer);
+      debouceTimer = window.setTimeout(callback, time);
+    };
+
+    const sendSearchQuery = async (query) => {
+      try {
+        await fetch("/searches", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({ query: query })
+        })
+        console.log("Sent: ${query}");
+      } catch (error) {
+        console.error("Error sending search query:", error);
+      }
+    }
+
+    searchBox.addEventListener("input", (event) => {
+      const query = event.target.value;
+
+      debounce(() => {
+        sendSearchQuery(query);
+      }, 250);
+    });
+  })
 </script>
