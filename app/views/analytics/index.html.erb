@@ -1,0 +1,60 @@
+<h1>Helpjuice SearchBox</h1>
+
+<h2>Search something</h2>
+<input type="text" id="search-box" placeholder="Start typing to search..." size="50">
+
+<hr>
+
+<h2>Trending Searches</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Search</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @trends.each do |query, count| %>
+    <tr>
+      <td><%= query %></td>
+      <td><%= count %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchBox = document.getElementById("search-box");
+
+    let debouceTimer;
+    const debounce = (callback, time) => {
+      window.clearTimeout(debouceTimer);
+      debouceTimer = window.setTimeout(callback, time);
+    };
+
+    const sendSearchQuery = async (query) => {
+      try {
+        await fetch("/searches", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({ query: query })
+        })
+        console.log("Sent: ${query}");
+      } catch (error) {
+        console.error("Error sending search query:", error);
+      }
+    }
+
+    searchBox.addEventListener("input", (event) => {
+      const query = event.target.value;
+
+      debounce(() => {
+        sendSearchQuery(query);
+      }, 250);
+    });
+  })
+</script>
