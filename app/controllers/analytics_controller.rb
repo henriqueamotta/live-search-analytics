@@ -1,38 +1,37 @@
+# app/controllers/analytics_controller.rb
 class AnalyticsController < ApplicationController
   def index
-    # Clears incomplete searches. Search is considered incomplete if it has not been updated in the last 10 seconds.
     cleanup_incomplete_searches
+    @trends = fetch_trends
+  end
 
-    # Groups searches by query and orders them by the count of occurrences.
-    # Shows the 10 most popular searches.
-    @trends = Search.group(:query)
-                    .order("COUNT(id) DESC")
-                    .limit(10)
-                    .count
+  def trends
+    cleanup_incomplete_searches
+    @trends = fetch_trends
+    render json: @trends
   end
 
   private
 
+  def fetch_trends
+    Search.group(:query).order("COUNT(id) DESC").limit(50).count
+  end
+
   def cleanup_incomplete_searches
-    # Search all recent searches for the same IP
-    recent_searches_by_ip = Search.where("created_at > ?", 1.hour.ago)
-                                  .group_by(&:user_ip)
+    ips_to_check = Search.where("last_seen_at > ?", 1.hour.ago).pluck(:user_ip).uniq
 
-    searches_to_delete = [] # Array to hold searches to be deleted
+    ips_to_check.each do |ip|
+      searches = Search.where(user_ip: ip)
+      next if searches.count < 2
 
-    recent_searches_by_ip.each do |user_ip, searches|
-      # Sort searches by newest to oldest
-      sorted_searches = searches.sort_by(&:created_at).reverse
+      final_search = searches.order(last_seen_at: :desc).first
+      next unless final_search
 
-      next if sorted_searches.count < 2 # Skip if there are not enough searches
-      final_search = sorted_searches.first
-
-      sorted_searches[1..].each do |potencial_incomplete| # Check all but the most recent search
-        if final_search.query.start_with?(potencial_incomplete.query) # If the most recent search starts with the previous one
-        searches_to_delete << potencial_incomplete.id # Add to the list of searches to delete
-        end
+      searches_to_delete = searches.where.not(id: final_search.id).select do |s|
+        final_search.query.start_with?(s.query) && final_search.query != s.query
       end
+
+      Search.where(id: searches_to_delete.map(&:id)).delete_all if searches_to_delete.any?
     end
-    Search.where(id: searches_to_delete).delete_all if searches_to_delete.any? # Delete all searches in the list
   end
 end
