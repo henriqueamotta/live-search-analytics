@@ -1,88 +1,245 @@
-<h1>Helpjuice SearchBox</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Helpjuice Search Analytics</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-<h2>Search something</h2>
-<div>
-  <input type="text" id="search-box" placeholder="Start typing to search..." size="50">
-  <button id="search-button">Search</button>
-</div>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F9FAFB;
+      color: #374151;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
 
-<hr>
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background-color: #FFFFFF;
+      border-radius: 12px;
+      padding: 2rem 2.5rem 2.5rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      border: 1px solid #E5E7EB;
+    }
 
-<h2>Trending Searches</h2>
-<table data-turbo="false">
-  <thead>
-    <tr>
-      <th>Search</th>
-      <th>Popularity</th>
-    </tr>
-  </thead>
-  <tbody id="trends-body">
-    <% @trends.each do |query, percentage| %>
-      <tr>
-        <td><%= query %></td>
-        <td><%= percentage %>%</td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    h1 {
+      color: #111827;
+      padding-bottom: 1rem;
+      margin-top: 0;
+      text-align: center;
+    }
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const searchBox = document.getElementById('search-box');
-    const searchButton = document.getElementById('search-button');
-    const trendsBody = document.getElementById('trends-body');
+    h2 {
+      color: #111827;
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #E5E7EB;
+      padding-bottom: 0.75rem;
+    }
 
-    const updateAnalyticsDisplay = async () => {
-      try {
-        const response = await fetch('/analytics/trends');
-        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-        const trends = await response.json();
+    hr { display: none; }
 
-        while (trendsBody.firstChild) {
-          trendsBody.removeChild(trendsBody.firstChild);
+    .search-section {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    #search-box {
+      flex-grow: 1;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #search-box:focus {
+      outline: none;
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 3px rgb(59 130 246 / 0.2);
+    }
+
+    #search-button {
+      background-color: #3B82F6;
+      color: white;
+      font-weight: 500;
+      font-size: 1rem;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    #search-button:hover {
+      background-color: #2563EB;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 1rem;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    th {
+      background-color: #F9FAFB;
+      color: #6B7280;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .query-cell {
+      color: #1E40AF;
+      font-weight: 500;
+    }
+
+    .percentage-cell {
+      position: relative;
+      width: 150px;
+    }
+
+    .percentage-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #BFDBFE;
+      z-index: 1;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .percentage-text {
+      position: relative;
+      z-index: 2;
+      font-weight: 600;
+      color: #1E3A8A;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Helpjuice Search Analytics</h1>
+
+    <h2>Search something</h2>
+    <div class="search-section">
+      <input type="text" id="search-box" placeholder="What are you looking for?">
+      <button id="search-button">Search</button>
+    </div>
+
+    <h2>Trending Searches</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Search</th>
+          <th>Popularity</th>
+        </tr>
+      </thead>
+      <tbody id="trends-body">
+        <% @trends.each do |query, percentage| %>
+          <tr>
+            <td class="query-cell"><%= query %></td>
+            <td class="percentage-cell">
+              <div class="percentage-bar" style="width: <%= percentage %>%;"></div>
+              <span class="percentage-text"><%= percentage %>%</span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchBox = document.getElementById('search-box');
+      const searchButton = document.getElementById('search-button');
+      const trendsBody = document.getElementById('trends-body');
+
+      const updateAnalyticsDisplay = async () => {
+        try {
+          const response = await fetch('/analytics/trends');
+          if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+          const trends = await response.json();
+
+          while (trendsBody.firstChild) {
+            trendsBody.removeChild(trendsBody.firstChild);
+          }
+
+          for (const [query, percentage] of Object.entries(trends)) {
+            const row = trendsBody.insertRow();
+
+            const cellQuery = row.insertCell();
+            cellQuery.className = 'query-cell';
+            cellQuery.textContent = query;
+
+            const cellPercentage = row.insertCell();
+            cellPercentage.className = 'percentage-cell';
+
+            const bar = document.createElement('div');
+            bar.className = 'percentage-bar';
+            bar.style.width = `${percentage}%`;
+
+            const text = document.createElement('span');
+            text.className = 'percentage-text';
+            text.textContent = `${percentage}%`;
+
+            cellPercentage.appendChild(bar);
+            cellPercentage.appendChild(text);
+          }
+        } catch (error) {
+          console.error('Falha ao atualizar a exibição da tabela:', error);
         }
+      };
 
-        for (const [query, count] of Object.entries(trends)) {
-          const row = trendsBody.insertRow();
-          row.insertCell().textContent = query;
-          row.insertCell().textContent = `${percentage}%`;
+      let debounceTimer;
+      const debounce = (callback, time) => {
+        window.clearTimeout(debounceTimer);
+        debounceTimer = window.setTimeout(callback, time);
+      };
+
+      const sendSearchQuery = async (query) => {
+        if (!query || query.trim() === '') return;
+        try {
+          await fetch('/searches', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ query: query.trim() })
+          });
+          await updateAnalyticsDisplay();
+        } catch (error) {
+          console.error('Falha ao enviar a busca:', error);
         }
-      } catch (error) {
-        console.error('Failed to refresh table view:', error);
-      }
-    };
+      };
 
-    let debounceTimer;
-    const debounce = (callback, time) => {
-      window.clearTimeout(debounceTimer);
-      debounceTimer = window.setTimeout(callback, time);
-    };
+      searchBox.addEventListener('input', (event) => {
+        debounce(() => sendSearchQuery(event.target.value), 750);
+      });
 
-    const sendSearchQuery = async (query) => {
-      if (!query || query.trim() === '') return;
-
-      try {
-        await fetch('/searches', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ query: query.trim() })
-        });
-        await updateAnalyticsDisplay();
-      } catch (error) {
-        console.error('Failed to send search query:', error);
-      }
-    };
-
-    searchBox.addEventListener('input', (event) => {
-      debounce(() => sendSearchQuery(event.target.value), 750);
+      searchButton.addEventListener('click', () => {
+        window.clearTimeout(debounceTimer);
+        sendSearchQuery(searchBox.value);
+      });
     });
+  </script>
 
-    searchButton.addEventListener('click', () => {
-      window.clearTimeout(debounceTimer);
-      sendSearchQuery(searchBox.value);
-    });
-  });
-</script>
+</body>
+</html>
