@@ -1,60 +1,88 @@
 <h1>Helpjuice SearchBox</h1>
 
 <h2>Search something</h2>
-<input type="text" id="search-box" placeholder="Start typing to search..." size="50">
+<div>
+  <input type="text" id="search-box" placeholder="Start typing to search..." size="50">
+  <button id="search-button">Search</button>
+</div>
 
 <hr>
 
 <h2>Trending Searches</h2>
-<table>
+<table data-turbo="false">
   <thead>
     <tr>
       <th>Search</th>
-      <th>Count</th>
+      <th>Popularity</th>
     </tr>
   </thead>
-  <tbody>
-    <% @trends.each do |query, count| %>
-    <tr>
-      <td><%= query %></td>
-      <td><%= count %></td>
-    </tr>
+  <tbody id="trends-body">
+    <% @trends.each do |query, percentage| %>
+      <tr>
+        <td><%= query %></td>
+        <td><%= percentage %>%</td>
+      </tr>
     <% end %>
   </tbody>
 </table>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const searchBox = document.getElementById("search-box");
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchBox = document.getElementById('search-box');
+    const searchButton = document.getElementById('search-button');
+    const trendsBody = document.getElementById('trends-body');
 
-    let debouceTimer;
+    const updateAnalyticsDisplay = async () => {
+      try {
+        const response = await fetch('/analytics/trends');
+        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+        const trends = await response.json();
+
+        while (trendsBody.firstChild) {
+          trendsBody.removeChild(trendsBody.firstChild);
+        }
+
+        for (const [query, count] of Object.entries(trends)) {
+          const row = trendsBody.insertRow();
+          row.insertCell().textContent = query;
+          row.insertCell().textContent = `${percentage}%`;
+        }
+      } catch (error) {
+        console.error('Failed to refresh table view:', error);
+      }
+    };
+
+    let debounceTimer;
     const debounce = (callback, time) => {
-      window.clearTimeout(debouceTimer);
-      debouceTimer = window.setTimeout(callback, time);
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(callback, time);
     };
 
     const sendSearchQuery = async (query) => {
+      if (!query || query.trim() === '') return;
+
       try {
-        await fetch("/searches", {
-          method: "POST",
+        await fetch('/searches', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
-          body: JSON.stringify({ query: query })
-        })
-        console.log(`Sent: ${query}`);
+          body: JSON.stringify({ query: query.trim() })
+        });
+        await updateAnalyticsDisplay();
       } catch (error) {
-        console.error("Error sending search query:", error);
+        console.error('Failed to send search query:', error);
       }
-    }
+    };
 
-    searchBox.addEventListener("input", (event) => {
-      const query = event.target.value;
-
-      debounce(() => {
-        sendSearchQuery(query);
-      }, 250);
+    searchBox.addEventListener('input', (event) => {
+      debounce(() => sendSearchQuery(event.target.value), 750);
     });
-  })
+
+    searchButton.addEventListener('click', () => {
+      window.clearTimeout(debounceTimer);
+      sendSearchQuery(searchBox.value);
+    });
+  });
 </script>
