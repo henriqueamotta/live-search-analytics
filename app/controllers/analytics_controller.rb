@@ -1,7 +1,7 @@
 class AnalyticsController < ApplicationController
   def index
     # Clears incomplete searches. Search is considered incomplete if it has not been updated in the last 10 seconds.
-    # cleanup_incomplete_searches
+    cleanup_incomplete_searches
 
     # Groups searches by query and orders them by the count of occurrences.
     # Shows the 10 most popular searches.
