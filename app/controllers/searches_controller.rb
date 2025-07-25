@@ -4,7 +4,11 @@ class SearchesController < ApplicationController
   SESSION_TIMEOUT = 5.minutes
 
   def create
-    query_text = params[:query].to_s.strip
+    query_text = I18n.transliterate(params[:query].to_s)
+                      .downcase
+                      .gsub(/[[:punct:]]/, "")
+                      .strip
+                      .squeeze(" ")
 
     return head :ok if query_text.blank?
 
