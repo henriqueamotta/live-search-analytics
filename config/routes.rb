@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   post "/searches", to: "searches#create"
 
   # Route to display analytics
-  get "/analytics", to: "analytics#index"
+  get "analytics/index"
 
   # Define the root path
   root "analytics#index"
