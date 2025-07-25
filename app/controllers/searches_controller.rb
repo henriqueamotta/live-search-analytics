@@ -6,9 +6,9 @@ class SearchesController < ApplicationController
   def create
     query_text = I18n.transliterate(params[:query].to_s)
                       .downcase
-                      .gsub(/[[:punct:]]/, "")
+                      .gsub(/[[:punct:]]/, '')
                       .strip
-                      .squeeze(" ")
+                      .squeeze(' ')
 
     return head :ok if query_text.blank?
 
