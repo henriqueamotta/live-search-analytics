@@ -8,7 +8,7 @@ The main focus is not on the search results themselves, but on the engineering b
 
 ## Live Demo
 
-[**LINK TO THE LIVE HEROKU APPLICATION HERE**](https://helpjuice-challenge-315b5d2ddd9f.herokuapp.com/)
+[**LINK TO THE LIVE HEROKU APPLICATION HERE**](https://helpjuice-internship-b0bfb5bebcf7.herokuapp.com/)
 
 ## Core Features
 
