@@ -13,14 +13,14 @@
   <thead>
     <tr>
       <th>Search</th>
-      <th>Count</th>
+      <th>Popularity</th>
     </tr>
   </thead>
   <tbody id="trends-body">
-    <% @trends.each do |query, count| %>
+    <% @trends.each do |query, percentage| %>
       <tr>
         <td><%= query %></td>
-        <td><%= count %></td>
+        <td><%= percentage %>%</td>
       </tr>
     <% end %>
   </tbody>
@@ -45,10 +45,10 @@
         for (const [query, count] of Object.entries(trends)) {
           const row = trendsBody.insertRow();
           row.insertCell().textContent = query;
-          row.insertCell().textContent = count;
+          row.insertCell().textContent = `${percentage}%`;
         }
       } catch (error) {
-        console.error('Falha ao atualizar a exibição da tabela:', error);
+        console.error('Failed to refresh table view:', error);
       }
     };
 
@@ -72,7 +72,7 @@
         });
         await updateAnalyticsDisplay();
       } catch (error) {
-        console.error('Falha ao enviar a busca:', error);
+        console.error('Failed to send search query:', error);
       }
     };
 

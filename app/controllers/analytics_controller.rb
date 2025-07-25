@@ -14,7 +14,20 @@ class AnalyticsController < ApplicationController
   private
 
   def fetch_trends
-    Search.group(:query).order("COUNT(id) DESC").limit(50).count
+    counts = Search.group(:query)
+                   .order("COUNT(id) DESC")
+                   .limit(50)
+                   .count
+
+    total_searches = counts.values.sum.to_f
+
+    return {} if total_searches.zero?
+
+    percentages = counts.transform_values do |count|
+      (count / total_searches * 100).round(1)
+    end
+
+    percentages
   end
 
   def cleanup_incomplete_searches
