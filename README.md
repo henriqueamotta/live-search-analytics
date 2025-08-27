@@ -1,14 +1,10 @@
-# Helpjuice Search Analytics: Test Project
+# Live Search Analytics Application
 
 ## Description
 
-This is a Full-Stack application built with Ruby on Rails and Vanilla JavaScript as part of the internship selection process for Helpjuice. The project's goal is to create a search box that analyzes user behavior in real-time, providing metrics on the most popular search terms.
+This is a Full-Stack application built with Ruby on Rails and Vanilla JavaScript. The project's goal is to create a search box that analyzes user search queries in real-time, logging each entry and displaying live analytics on the most popular terms.
 
-The main focus is not on the search results themselves, but on the engineering behind collecting and analyzing the search data. This includes solving challenges like the "pyramid problem" and normalizing data to generate accurate trend analyses.
-
-## Live Demo
-
-[**LINK TO THE LIVE HEROKU APPLICATION HERE**](https://helpjuice-challenge-315b5d2ddd9f.herokuapp.com/)
+The main focus is on the engineering behind collecting and analyzing the search data. This includes solving challenges like the "pyramid problem" (consolidating partial queries) and normalizing data to generate accurate trend analyses.
 
 ## Core Features
 
@@ -23,7 +19,7 @@ The main focus is not on the search results themselves, but on the engineering b
 
 -   **Back-End:** Ruby on Rails
 -   **Front-End:** JavaScript (Vanilla JS), HTML5, CSS3
--   **Database:** PostgreSQL (chosen for its compatibility with Heroku)
+-   **Database:** PostgreSQL
 -   **Testing:** RSpec
 
 ## Local Environment Setup
@@ -32,8 +28,8 @@ To run the project on your local machine, follow the steps below:
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/your-repository.git](https://github.com/your-username/your-repository.git)
-    cd your-repository
+    git clone [https://github.com/henriqueamotta/live-search-analytics.git](https://github.com/henriqueamotta/live-search-analytics.git)
+    cd live-search-analytics
     ```
 
 2.  **Install dependencies:**
@@ -53,35 +49,6 @@ To run the project on your local machine, follow the steps below:
     ```
 
 5.  Open your browser and navigate to `http://localhost:3000`.
-
-## Deployment (Heroku)
-
-This project is ready to be deployed to Heroku. The basic steps are:
-
-1.  **Log in to the Heroku CLI:**
-    ```bash
-    heroku login
-    ```
-
-2.  **Create the Heroku application:**
-    ```bash
-    heroku create a-unique-name-for-your-app
-    ```
-
-3.  **Push the code to Heroku:**
-    ```bash
-    git push heroku main
-    ```
-
-4.  **Run the database migrations on the server:**
-    ```bash
-    heroku run rails db:migrate
-    ```
-
-5.  **Open the application in your browser:**
-    ```bash
-    heroku open
-    ```
 
 ## Running Tests
 

@@ -6,11 +6,11 @@ default: &default
 
 development:
   <<: *default
-  database: helpjuice_searchbox_development
+  database: live_search_analytics_development
 
 test:
   <<: *default
-  database: helpjuice_searchbox_test
+  database: live_search_analytics_test
 
 production:
   <<: *default
